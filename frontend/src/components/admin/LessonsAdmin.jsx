@@ -114,7 +114,7 @@ export default function LessonsAdmin() {
       days: lesson.days || [],
       day: lesson.day || '',
       one_time_date: lesson.one_time_date || '',
-      time: lesson.time || '',
+      time: lesson.time ? String(lesson.time).slice(0, 5) : '',
       location: lesson.location || '',
       image_url: lesson.image_url || '',
       is_active: lesson.is_active !== false,
@@ -185,7 +185,7 @@ export default function LessonsAdmin() {
                   onCheckedChange={() => updateMutation.mutate({ id: lesson.id, data: { is_active: !(lesson.is_active !== false) } })}
                   disabled={updateMutation.isPending}
                 />
-                <span className="font-heebo font-bold text-primary tabular-nums w-14 text-center">{lesson.time}</span>
+                <span className="font-heebo font-bold text-primary tabular-nums w-14 text-center">{String(lesson.time || '').slice(0, 5)}</span>
                 <div className="flex-1 min-w-0 text-right">
                   <div className="flex items-center justify-end gap-2">
                     <span className="font-heebo font-bold text-foreground">{lesson.title}</span>
