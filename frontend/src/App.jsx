@@ -1,4 +1,5 @@
 import { Toaster } from "@/components/ui/toaster"
+import { useEffect } from 'react';
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
 import { HashRouter as Router, Route, Routes } from 'react-router-dom';
@@ -16,6 +17,10 @@ import AdminCalendar from './pages/AdminCalendar';
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
 
+  useEffect(() => {
+    if (authError?.type === 'auth_required') navigateToLogin();
+  }, [authError, navigateToLogin]);
+
   // Show loading spinner while checking app public settings or auth
   if (isLoadingPublicSettings || isLoadingAuth) {
     return (
@@ -29,11 +34,7 @@ const AuthenticatedApp = () => {
   if (authError) {
     if (authError.type === 'user_not_registered') {
       return <UserNotRegisteredError />;
-    } else if (authError.type === 'auth_required') {
-      // Redirect to login automatically
-      navigateToLogin();
-      return null;
-    }
+    } else if (authError.type === 'auth_required') return null;
   }
 
   // Render the main app
