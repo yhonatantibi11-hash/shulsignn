@@ -70,7 +70,7 @@ export default function EventsAdmin() {
     setForm({
       name: event.name || '',
       date: event.date || '',
-      time: event.time || '',
+      time: event.time ? String(event.time).slice(0, 5) : '',
       description: event.description || '',
       image_url: event.image_url || '',
     });
@@ -130,7 +130,7 @@ export default function EventsAdmin() {
                 </div>
                 <div className="text-left shrink-0">
                   {event.time && (
-                    <span className="font-heebo font-bold text-primary tabular-nums" dir="ltr">{event.time}</span>
+                    <span className="font-heebo font-bold text-primary tabular-nums" dir="ltr">{String(event.time).slice(0, 5)}</span>
                   )}
                   <p className="text-xs text-muted-foreground" dir="ltr">
                     {format(new Date(event.date), 'dd/MM/yyyy')}
