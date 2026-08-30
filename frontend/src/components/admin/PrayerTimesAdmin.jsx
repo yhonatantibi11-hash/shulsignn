@@ -72,14 +72,28 @@ export default function PrayerTimesAdmin() {
       closeDialog();
       toast.success('תפילה נוספה בהצלחה');
     },
+    onError: () => toast.error('התפילה לא נשמרה. נסה שוב'),
   });
 
   const updateMutation = useMutation({
     mutationFn: ({ id, data }) => base44.entities.PrayerTime.update(id, data),
+    onMutate: async ({ id, data }) => {
+      const queryKey = ['prayerTimes', synagogueId];
+      await queryClient.cancelQueries({ queryKey });
+      const previous = queryClient.getQueryData(queryKey);
+      queryClient.setQueryData(queryKey, (current = []) =>
+        current.map((prayer) => prayer.id === id ? { ...prayer, ...data } : prayer)
+      );
+      return { previous, queryKey };
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['prayerTimes', synagogueId] });
       closeDialog();
       toast.success('תפילה עודכנה בהצלחה');
+    },
+    onError: (_error, _variables, context) => {
+      if (context?.previous) queryClient.setQueryData(context.queryKey, context.previous);
+      toast.error('השינוי לא נשמר. נסה שוב');
     },
   });
 
@@ -181,6 +195,7 @@ export default function PrayerTimesAdmin() {
                 <Switch
                   checked={prayer.is_active !== false}
                   onCheckedChange={() => toggleActive(prayer)}
+                  disabled={updateMutation.isPending}
                 />
                 <span className="font-heebo font-bold text-primary tabular-nums w-14 text-center">
                   {prayer.time}
@@ -277,8 +292,8 @@ export default function PrayerTimesAdmin() {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={closeDialog} className="font-heebo">ביטול</Button>
-            <Button onClick={handleSave} className="font-heebo">
-              {editingPrayer ? 'עדכן' : 'הוסף'}
+            <Button onClick={handleSave} disabled={createMutation.isPending || updateMutation.isPending} className="font-heebo">
+              {createMutation.isPending || updateMutation.isPending ? 'שומר...' : editingPrayer ? 'עדכן' : 'הוסף'}
             </Button>
           </DialogFooter>
         </DialogContent>
