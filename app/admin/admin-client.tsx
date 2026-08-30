@@ -29,7 +29,7 @@ function Login() {
     const response = await fetch("/api/auth/login", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: form.get("email"), password: form.get("password") }) });
     const result = await response.json();
     if (!response.ok) { setError(result.error || "ההתחברות נכשלה"); setBusy(false); return; }
-    window.location.reload();
+    window.location.assign("/app/index.html#/admin");
   }
   return <main className="admin-login"><form onSubmit={submit}><span>ShulSign</span><h1>כניסה לניהול</h1><p>התחבר עם המשתמש שיצרת ב־Supabase.</p><label>כתובת מייל<Input name="email" type="email" required autoComplete="email" /></label><label>סיסמה<Input name="password" type="password" required autoComplete="current-password" /></label>{error && <div className="form-error">{error}</div>}<Button type="submit" disabled={busy}>{busy ? "מתחבר…" : "כניסה למערכת"}</Button><Link href="/display/mizmor-ledavid">חזרה למסך התצוגה</Link></form></main>;
 }
