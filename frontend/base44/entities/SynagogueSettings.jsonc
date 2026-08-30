@@ -1,0 +1,38 @@
+{
+  "name": "SynagogueSettings",
+  "type": "object",
+  "properties": {
+    "synagogue_id": {
+      "type": "string",
+      "description": "Reference to the Synagogue entity"
+    },
+    "synagogue_name": {
+      "type": "string",
+      "description": "Name of the synagogue"
+    },
+    "custom_message": {
+      "type": "string",
+      "description": "Custom scrolling message for the display"
+    },
+    "secondary_message": {
+      "type": "string",
+      "description": "Secondary message"
+    },
+    "display_theme": {
+      "type": "string",
+      "default": "dark",
+      "description": "Display theme: 'dark', 'light', or 'custom:{themeId}'"
+    },
+    "zmanim_keys": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": [],
+      "description": "Keys of zmanim (from the hebcal API) to display in the 'Zmanim' widget; empty array uses the default set"
+    }
+  },
+  "required": [
+    "synagogue_name"
+  ]
+}

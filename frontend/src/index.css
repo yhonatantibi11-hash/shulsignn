@@ -1,0 +1,124 @@
+@import url('https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&family=Frank+Ruhl+Libre:wght@400;500;700;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 210 60% 96%;
+    --foreground: 214 40% 12%;
+    --card: 0 0% 100%;
+    --card-foreground: 214 40% 12%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 214 40% 12%;
+    --primary: 210 85% 45%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 205 50% 90%;
+    --secondary-foreground: 214 40% 18%;
+    --muted: 205 45% 93%;
+    --muted-foreground: 214 20% 45%;
+    --accent: 196 80% 50%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 210 40% 84%;
+    --input: 210 40% 88%;
+    --ring: 210 85% 45%;
+    --chart-1: 220 60% 45%;
+    --chart-2: 38 90% 55%;
+    --chart-3: 197 37% 24%;
+    --chart-4: 43 74% 66%;
+    --chart-5: 27 87% 67%;
+    --radius: 0.75rem;
+    --font-heebo: 'Heebo', sans-serif;
+    --font-frank: 'Frank Ruhl Libre', serif;
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  .dark {
+    --background: 222 30% 8%;
+    --foreground: 40 30% 92%;
+    --card: 222 25% 12%;
+    --card-foreground: 40 30% 92%;
+    --popover: 222 25% 12%;
+    --popover-foreground: 40 30% 92%;
+    --primary: 38 90% 55%;
+    --primary-foreground: 222 30% 8%;
+    --secondary: 222 20% 18%;
+    --secondary-foreground: 40 30% 90%;
+    --muted: 222 20% 15%;
+    --muted-foreground: 220 10% 55%;
+    --accent: 38 90% 55%;
+    --accent-foreground: 222 30% 8%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 222 20% 20%;
+    --input: 222 20% 20%;
+    --ring: 38 90% 55%;
+    --chart-1: 38 90% 55%;
+    --chart-2: 220 60% 50%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+.light-shabbat {
+    --background: 45 60% 97%;
+    --foreground: 35 40% 15%;
+    --card: 42 80% 99%;
+    --card-foreground: 35 40% 15%;
+    --popover: 42 80% 99%;
+    --popover-foreground: 35 40% 15%;
+    --primary: 38 75% 42%;
+    --primary-foreground: 42 80% 99%;
+    --secondary: 44 50% 91%;
+    --secondary-foreground: 35 40% 20%;
+    --muted: 43 45% 93%;
+    --muted-foreground: 35 25% 45%;
+    --accent: 38 85% 50%;
+    --accent-foreground: 42 80% 99%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 40 40% 82%;
+    --input: 40 40% 82%;
+    --ring: 38 75% 42%;
+  }
+
+@layer utilities {
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+}

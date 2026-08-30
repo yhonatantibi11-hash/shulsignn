@@ -1,0 +1,65 @@
+{
+  "name": "TorahLesson",
+  "type": "object",
+  "properties": {
+    "synagogue_id": {
+      "type": "string",
+      "description": "Reference to the Synagogue entity"
+    },
+    "title": {
+      "type": "string",
+      "description": "Lesson title"
+    },
+    "speaker": {
+      "type": "string",
+      "description": "Speaker/Rabbi name"
+    },
+    "schedule_type": {
+      "type": "string",
+      "enum": [
+        "weekly",
+        "one_time"
+      ],
+      "default": "weekly",
+      "description": "Whether the lesson is weekly or one-time"
+    },
+    "days": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": [],
+      "description": "Days of week for weekly lessons (sunday, monday, tuesday, wednesday, thursday, friday, saturday)"
+    },
+    "day": {
+      "type": "string",
+      "description": "Legacy day field (kept for backwards compatibility)"
+    },
+    "one_time_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Date for one-time lessons"
+    },
+    "time": {
+      "type": "string",
+      "description": "Lesson time (HH:MM)"
+    },
+    "location": {
+      "type": "string",
+      "description": "Location of the lesson"
+    },
+    "image_url": {
+      "type": "string",
+      "description": "Optional poster image URL shown on the display when the lesson is relevant"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    }
+  },
+  "required": [
+    "title",
+    "speaker",
+    "time"
+  ]
+}

@@ -1,0 +1,88 @@
+{
+  "name": "DisplayTheme",
+  "type": "object",
+  "properties": {
+    "synagogue_id": {
+      "type": "string",
+      "description": "Reference to the Synagogue entity \u2014 scopes the theme to one synagogue"
+    },
+    "name": {
+      "type": "string",
+      "description": "Theme display name"
+    },
+    "bg_type": {
+      "type": "string",
+      "enum": [
+        "color",
+        "image_url"
+      ],
+      "default": "color",
+      "description": "Background type"
+    },
+    "bg_value": {
+      "type": "string",
+      "description": "Hex color (e.g. #1a1a2e) or image URL"
+    },
+    "color_primary": {
+      "type": "string",
+      "description": "Primary/accent color hex (e.g. #d4a017)"
+    },
+    "color_card_bg": {
+      "type": "string",
+      "description": "Card background hex with optional opacity"
+    },
+    "color_text": {
+      "type": "string",
+      "description": "Main text color hex"
+    },
+    "color_text_muted": {
+      "type": "string",
+      "description": "Secondary/muted text color hex"
+    },
+    "color_border": {
+      "type": "string",
+      "description": "Border color hex"
+    },
+    "widget_order": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": [
+        "prayers",
+        "lessons",
+        "events",
+        "zmanim"
+      ],
+      "description": "Widget display order"
+    },
+    "widget_visible": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": [
+        "prayers",
+        "lessons",
+        "events",
+        "zmanim"
+      ],
+      "description": "Which widgets are visible"
+    }
+  },
+  "required": [
+    "name"
+  ],
+  "rls": {
+    "create": {
+      "created_by_id": "{{user.id}}"
+    },
+    "read": {},
+    "update": {
+      "created_by_id": "{{user.id}}"
+    },
+    "delete": {
+      "created_by_id": "{{user.id}}"
+    }
+  }
+}

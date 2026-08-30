@@ -1,0 +1,21 @@
+{
+  "name": "Synagogue",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Name of the synagogue"
+    },
+    "address": {
+      "type": "string",
+      "description": "Address of the synagogue"
+    },
+    "owner_id": {
+      "type": "string",
+      "description": "User ID of the primary admin/gabbai"
+    }
+  },
+  "required": [
+    "name"
+  ]
+}
