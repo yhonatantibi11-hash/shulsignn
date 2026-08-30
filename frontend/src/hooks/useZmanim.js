@@ -55,7 +55,10 @@ export default function useZmanim(selectedKeys, savedLocation) {
 
   // Get geolocation once
   useEffect(() => {
-    if (Number.isFinite(Number(savedLocation?.latitude)) && Number.isFinite(Number(savedLocation?.longitude))) {
+    const hasSavedCoordinates = savedLocation?.latitude !== null && savedLocation?.latitude !== undefined &&
+      savedLocation?.longitude !== null && savedLocation?.longitude !== undefined &&
+      Number.isFinite(Number(savedLocation.latitude)) && Number.isFinite(Number(savedLocation.longitude));
+    if (hasSavedCoordinates) {
       setLocation({ lat: Number(savedLocation.latitude), lng: Number(savedLocation.longitude) });
       return;
     }
