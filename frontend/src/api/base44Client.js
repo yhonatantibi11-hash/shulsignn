@@ -7,9 +7,16 @@ let adminCache = null;
 let publicCache = null;
 
 async function jsonFetch(url, options) {
-  const response = await fetch(url, options);
+  const response = await fetch(url, { cache: 'no-store', ...options });
   if (!response.ok) {
-    const error = new Error(`Request failed: ${response.status}`);
+    let detail = '';
+    try {
+      const body = await response.json();
+      detail = body.detail || body.error || '';
+    } catch {
+      detail = await response.text().catch(() => '');
+    }
+    const error = new Error(detail || `Request failed: ${response.status}`);
     error.status = response.status;
     throw error;
   }
@@ -24,7 +31,7 @@ async function loadPublic() {
 }
 
 async function loadAdmin() {
-  if (!adminCache) adminCache = jsonFetch('/api/admin/data');
+  if (!adminCache) adminCache = jsonFetch(`/api/admin/data?_=${Date.now()}`);
   return adminCache;
 }
 
@@ -54,12 +61,17 @@ async function filterEntity(name) {
 }
 
 async function mutate(name, action, id, values) {
+  // Drop every in-memory snapshot before writing so an invalidated React Query
+  // can never reuse data that was loaded before this mutation finished.
+  adminCache = null;
   const result = await jsonFetch('/api/admin/data', {
     method: 'POST', headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ resource: RESOURCES[name], action, id, values }),
   });
   adminCache = null;
-  return result.rows?.[0] || { id, ...values };
+  publicCache = null;
+  if (!result.rows?.length) throw new Error('השינוי לא נשמר במסד הנתונים');
+  return result.rows[0];
 }
 
 function entity(name) {
