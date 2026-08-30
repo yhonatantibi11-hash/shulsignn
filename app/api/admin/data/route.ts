@@ -7,6 +7,36 @@ const TABLES = {
   settings: "synagogue_settings", synagogue: "synagogues", themes: "display_themes",
 } as const;
 
+type Resource = keyof typeof TABLES;
+
+function toFrontend(resource: Resource, row: Record<string, unknown>) {
+  if (resource === "prayers") return { ...row, time: row.prayer_time };
+  if (resource === "lessons") return { ...row, time: row.lesson_time };
+  if (resource === "events") return { ...row, date: row.event_date, time: row.event_time };
+  return row;
+}
+
+function toDatabase(resource: Resource, values: Record<string, unknown> = {}) {
+  if (resource === "prayers") {
+    const { time, synagogue_id: _synagogueId, ...rest } = values;
+    return { ...rest, prayer_time: time };
+  }
+  if (resource === "lessons") {
+    const { time, day: _legacyDay, synagogue_id: _synagogueId, ...rest } = values;
+    return {
+      ...rest,
+      lesson_time: time || null,
+      one_time_date: rest.one_time_date || null,
+    };
+  }
+  if (resource === "events") {
+    const { date, time, synagogue_id: _synagogueId, ...rest } = values;
+    return { ...rest, event_date: date, event_time: time || null };
+  }
+  const { synagogue_id: _synagogueId, ...rest } = values;
+  return rest;
+}
+
 async function context() {
   const token = (await cookies()).get("shulsign_access")?.value;
   if (!token) return null;
@@ -38,7 +68,13 @@ export async function GET() {
       readTable("display_themes", ctx.synagogue_id, ctx.token),
     ]);
     return NextResponse.json(
-      { synagogue: synagogue[0], settings: settings[0], prayers, lessons, events, themes, role: ctx.role, user_id: ctx.user_id },
+      {
+        synagogue: synagogue[0], settings: settings[0],
+        prayers: prayers.map((row: Record<string, unknown>) => toFrontend("prayers", row)),
+        lessons: lessons.map((row: Record<string, unknown>) => toFrontend("lessons", row)),
+        events: events.map((row: Record<string, unknown>) => toFrontend("events", row)),
+        themes, role: ctx.role, user_id: ctx.user_id,
+      },
       { headers: { "Cache-Control": "private, no-store, max-age=0" } },
     );
   } catch {
@@ -59,7 +95,7 @@ export async function POST(request: Request) {
 
   if (body.action === "create") {
     if (!["prayers", "lessons", "events", "themes"].includes(body.resource)) return NextResponse.json({ error: "invalid_create" }, { status: 400 });
-    payload = { ...body.values, synagogue_id: ctx.synagogue_id };
+    payload = { ...toDatabase(body.resource, body.values), synagogue_id: ctx.synagogue_id };
   } else if (body.action === "update") {
     method = "PATCH";
     const filter = body.resource === "settings"
@@ -68,7 +104,7 @@ export async function POST(request: Request) {
         ? `id=eq.${ctx.synagogue_id}`
         : `id=eq.${encodeURIComponent(body.id || "")}&synagogue_id=eq.${ctx.synagogue_id}`;
     path = `${base}?${filter}`;
-    payload = body.values || {};
+    payload = toDatabase(body.resource, body.values);
   } else {
     if (!["prayers", "lessons", "events", "themes"].includes(body.resource) || !body.id) return NextResponse.json({ error: "invalid_delete" }, { status: 400 });
     method = "DELETE";
@@ -80,7 +116,8 @@ export async function POST(request: Request) {
     headers: { Prefer: "return=representation" },
   });
   if (!response.ok) return NextResponse.json({ error: "save_failed", detail: await response.text() }, { status: response.status });
-  const rows = await response.json() as Record<string, unknown>[];
+  const rows = (await response.json() as Record<string, unknown>[])
+    .map((row) => toFrontend(body.resource!, row));
   if (!rows.length) {
     return NextResponse.json(
       { error: "no_rows_changed", detail: "No matching row was changed. Check the record id and database permissions." },
