@@ -78,17 +78,26 @@ export default function Display() {
 
   const loadData = useCallback(async () => {
     if (!synagogueId) return;
-    const filter = { synagogue_id: synagogueId };
-    const [pt, ls, ev, st] = await Promise.all([
-      base44.entities.PrayerTime.filter(filter),
-      base44.entities.TorahLesson.filter(filter),
-      base44.entities.Event.filter(filter),
-      base44.entities.SynagogueSettings.filter(filter)
-    ]);
-    setPrayerTimes(pt);
-    setLessons(ls);
-    setEvents(ev);
-    if (st.length > 0) setSettings(st[0]);
+    try {
+      // The TV can remain open indefinitely. Always replace the public snapshot
+      // before reading entities so changes from the admin appear automatically.
+      await base44.public.refresh();
+      const filter = { synagogue_id: synagogueId };
+      const [pt, ls, ev, st] = await Promise.all([
+        base44.entities.PrayerTime.filter(filter),
+        base44.entities.TorahLesson.filter(filter),
+        base44.entities.Event.filter(filter),
+        base44.entities.SynagogueSettings.filter(filter)
+      ]);
+      setPrayerTimes(pt);
+      setLessons(ls);
+      setEvents(ev);
+      setSettings(st[0] || null);
+    } catch (error) {
+      // Keep the last good screen on transient network failures. The next poll
+      // retries automatically instead of blanking the synagogue display.
+      console.warn('Display refresh failed; keeping the last snapshot', error);
+    }
   }, [synagogueId]);
 
   // Load + live-subscribe to custom theme so theme edits reflect instantly.
@@ -109,8 +118,6 @@ export default function Display() {
     });
     return () => unsub && unsub();
   }, [settings?.display_theme]);
-
-  useEffect(() => { loadData(); }, [loadData]);
 
   useEffect(() => {
     if (!synagogueId) return;
@@ -134,8 +141,24 @@ export default function Display() {
   }, [synagogueId]);
 
   useEffect(() => {
-    const interval = setInterval(loadData, 60000);
-    return () => clearInterval(interval);
+    let stopped = false;
+    let timer;
+    const refresh = async () => {
+      await loadData();
+      if (!stopped) timer = window.setTimeout(refresh, 5000);
+    };
+    const refreshWhenVisible = () => {
+      if (document.visibilityState === 'visible') void loadData();
+    };
+    void refresh();
+    document.addEventListener('visibilitychange', refreshWhenVisible);
+    window.addEventListener('online', refreshWhenVisible);
+    return () => {
+      stopped = true;
+      window.clearTimeout(timer);
+      document.removeEventListener('visibilitychange', refreshWhenVisible);
+      window.removeEventListener('online', refreshWhenVisible);
+    };
   }, [loadData]);
 
   // Support ?date=YYYY-MM-DD for preview
