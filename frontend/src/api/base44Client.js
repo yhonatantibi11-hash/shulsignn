@@ -26,8 +26,13 @@ async function jsonFetch(url, options) {
 const isPublicDisplay = () => window.location.hash.startsWith('#/display');
 
 async function loadPublic() {
-  if (!publicCache) publicCache = jsonFetch('/api/public/display?slug=mizmor-ledavid');
+  if (!publicCache) publicCache = jsonFetch(`/api/public/display?slug=mizmor-ledavid&_=${Date.now()}`);
   return publicCache;
+}
+
+async function refreshPublic() {
+  publicCache = null;
+  return loadPublic();
 }
 
 async function loadAdmin() {
@@ -86,6 +91,7 @@ function entity(name) {
 }
 
 export const base44 = {
+  public: { refresh: refreshPublic },
   auth: {
     me: async () => { const data = await loadAdmin(); return { id: data.user_id, role: data.role }; },
     logout: async () => { await fetch('/api/auth/logout', { method: 'POST' }); window.location.assign('/admin'); },
