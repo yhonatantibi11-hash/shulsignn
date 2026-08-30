@@ -56,7 +56,7 @@ export default function LessonsPanel({ lessons, hideTitle = false, manualScroll 
                 </div>
                 <div className="text-left">
                   <span className="text-2xl font-heebo font-black text-primary tabular-nums" dir="ltr">
-                    {lesson.time}
+                    {String(lesson.time || '').slice(0, 5)}
                   </span>
                   <p className="text-base text-muted-foreground font-heebo">{lesson.day}</p>
                 </div>
