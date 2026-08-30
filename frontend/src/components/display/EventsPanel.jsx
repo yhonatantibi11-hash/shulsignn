@@ -41,7 +41,7 @@ export default function EventsPanel({ events, hideTitle = false, manualScroll = 
                 <div className="text-left">
                   {event.time &&
                   <span className="text-2xl font-heebo font-black text-primary tabular-nums" dir="ltr">
-                      {event.time}
+                      {String(event.time).slice(0, 5)}
                     </span>
                   }
                   <p className="text-base text-foreground/75 font-heebo">
