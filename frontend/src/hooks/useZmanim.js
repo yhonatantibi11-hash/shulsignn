@@ -41,13 +41,13 @@ export const DEFAULT_ZMANIM_KEYS = [
   'tzeit85deg',
 ];
 
-function formatTime(isoString) {
+function formatTime(isoString, timeZone = 'Asia/Jerusalem') {
   if (!isoString) return null;
   const d = new Date(isoString);
-  return d.toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit', hour12: false });
+  return d.toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone });
 }
 
-export default function useZmanim(selectedKeys) {
+export default function useZmanim(selectedKeys, savedLocation) {
   const [zmanim, setZmanim] = useState([]);
   const [location, setLocation] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -55,6 +55,10 @@ export default function useZmanim(selectedKeys) {
 
   // Get geolocation once
   useEffect(() => {
+    if (Number.isFinite(Number(savedLocation?.latitude)) && Number.isFinite(Number(savedLocation?.longitude))) {
+      setLocation({ lat: Number(savedLocation.latitude), lng: Number(savedLocation.longitude) });
+      return;
+    }
     if (!navigator.geolocation) {
       setError('Geolocation not supported');
       setLoading(false);
@@ -68,7 +72,7 @@ export default function useZmanim(selectedKeys) {
       },
       { timeout: 8000 }
     );
-  }, []);
+  }, [savedLocation?.latitude, savedLocation?.longitude]);
 
   const keys = (selectedKeys && selectedKeys.length > 0) ? selectedKeys : DEFAULT_ZMANIM_KEYS;
   const keysKey = keys.join(',');
@@ -81,10 +85,12 @@ export default function useZmanim(selectedKeys) {
     async function fetchZmanim() {
       setLoading(true);
       const now = new Date();
-      const dateStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
       // Derive the user's local timezone from the browser; combine with GPS coordinates
       // so hebcal computes zmanim for the user's actual location and clock settings.
-      const tzid = Intl.DateTimeFormat().resolvedOptions().timeZone || 'Asia/Jerusalem';
+      const tzid = savedLocation?.timezone || 'Asia/Jerusalem';
+      const dateStr = new Intl.DateTimeFormat('en-CA', {
+        timeZone: tzid, year: 'numeric', month: '2-digit', day: '2-digit',
+      }).format(now);
       try {
         const res = await fetch(
           `https://www.hebcal.com/zmanim?cfg=json&latitude=${location.lat}&longitude=${location.lng}&date=${dateStr}&tzid=${tzid}`
@@ -104,8 +110,8 @@ export default function useZmanim(selectedKeys) {
             const items = sdata.items || [];
             const candles = items.find(i => i.category === 'candles');
             const havdalah = items.find(i => i.category === 'havdalah');
-            if (candles) candlesTime = formatTime(candles.date);
-            if (havdalah) havdalahTime = formatTime(havdalah.date);
+            if (candles) candlesTime = formatTime(candles.date, tzid);
+            if (havdalah) havdalahTime = formatTime(havdalah.date, tzid);
           } catch (e) { /* ignore shabbat fetch errors */ }
         }
 
@@ -116,7 +122,7 @@ export default function useZmanim(selectedKeys) {
             let timeStr;
             if (key === 'shabbatIn') timeStr = candlesTime;
             else if (key === 'shabbatOut') timeStr = havdalahTime;
-            else timeStr = formatTime(times[key]);
+            else timeStr = formatTime(times[key], tzid);
             if (!timeStr) return null;
             return { key, label: config.label, icon: config.icon, time: timeStr };
           })
@@ -138,7 +144,7 @@ export default function useZmanim(selectedKeys) {
     const msUntilMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1) - now;
     const timer = setTimeout(fetchZmanim, msUntilMidnight);
     return () => clearTimeout(timer);
-  }, [location, keysKey, wantShabbat]);
+  }, [location, keysKey, wantShabbat, savedLocation?.timezone]);
 
   return { zmanim, loading, error };
 }

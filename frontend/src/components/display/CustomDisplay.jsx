@@ -73,7 +73,7 @@ export default function CustomDisplay({ theme, prayerTimes, lessons, events, set
       case 'prayers': return <PrayerTimesPanel key={key} prayerTimes={prayerTimes} hideTitle={hideTitle} manualScroll={manualScroll} />;
       case 'lessons': return <LessonsPanel key={key} lessons={lessons} hideTitle={hideTitle} manualScroll={manualScroll} />;
       case 'events': return <EventsPanel key={key} events={futureEvents} hideTitle={hideTitle} manualScroll={manualScroll} />;
-      case 'zmanim': return <ZmanimPanel key={key} hideTitle={hideTitle} selectedKeys={settings?.zmanim_keys} />;
+      case 'zmanim': return <ZmanimPanel key={key} hideTitle={hideTitle} selectedKeys={settings?.zmanim_keys} location={settings} />;
       default: return null;
     }
   }

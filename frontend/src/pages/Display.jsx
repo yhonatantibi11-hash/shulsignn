@@ -166,7 +166,7 @@ export default function Display() {
     <PrayerTimesPanel key="prayers" prayerTimes={prayerTimes} />,
     <LessonsPanel key="lessons" lessons={lessons} />,
     <EventsPanel key="events" events={futureEvents} />,
-    <ZmanimPanel key="zmanim" selectedKeys={settings?.zmanim_keys} />,
+    <ZmanimPanel key="zmanim" selectedKeys={settings?.zmanim_keys} location={settings} />,
   ];
 
   const panelLabels = ['תפילות', 'שיעורים', 'אירועים', 'זמני היום'];
@@ -181,7 +181,7 @@ export default function Display() {
           <PrayerTimesPanel prayerTimes={prayerTimes} />
           <LessonsPanel lessons={lessons} />
           <EventsPanel events={futureEvents} />
-          <ZmanimPanel selectedKeys={settings?.zmanim_keys} />
+          <ZmanimPanel selectedKeys={settings?.zmanim_keys} location={settings} />
         </div>
       </main>
 

@@ -3,13 +3,16 @@ import useZmanim from '@/hooks/useZmanim';
 import useClock from '@/hooks/useClock';
 import { Sun } from 'lucide-react';
 
-export default function ZmanimPanel({ hideTitle = false, selectedKeys }) {
-  const { zmanim, loading, error } = useZmanim(selectedKeys);
+export default function ZmanimPanel({ hideTitle = false, selectedKeys, location }) {
+  const { zmanim, loading, error } = useZmanim(selectedKeys, location);
   const { time: now } = useClock();
 
   // Highlight the next upcoming zman
   const getNextZmanKey = () => {
-    const currentMinutes = now.getHours() * 60 + now.getMinutes();
+    const [currentHour, currentMinute] = now.toLocaleTimeString('en-GB', {
+      timeZone: location?.timezone || 'Asia/Jerusalem', hour: '2-digit', minute: '2-digit',
+    }).split(':').map(Number);
+    const currentMinutes = currentHour * 60 + currentMinute;
     for (const z of zmanim) {
       const [h, m] = z.time.split(':').map(Number);
       if (h * 60 + m > currentMinutes) return z.key;
@@ -46,7 +49,10 @@ export default function ZmanimPanel({ hideTitle = false, selectedKeys }) {
           const isNext = z.key === nextKey;
           const [h, m] = z.time.split(':').map(Number);
           const zMinutes = h * 60 + m;
-          const nowMinutes = now.getHours() * 60 + now.getMinutes();
+          const [currentHour, currentMinute] = now.toLocaleTimeString('en-GB', {
+            timeZone: location?.timezone || 'Asia/Jerusalem', hour: '2-digit', minute: '2-digit',
+          }).split(':').map(Number);
+          const nowMinutes = currentHour * 60 + currentMinute;
           const isPast = zMinutes < nowMinutes;
 
           return (

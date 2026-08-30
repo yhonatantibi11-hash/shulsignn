@@ -31,7 +31,14 @@ async function loadAdmin() {
 function normalizePublic(data, name) {
   return ({
     Synagogue: data.synagogue ? [data.synagogue] : [],
-    SynagogueSettings: data.settings ? [{ ...data.settings, synagogue_id: data.synagogue?.id }] : [],
+    SynagogueSettings: data.settings ? [{
+      ...data.settings,
+      synagogue_id: data.synagogue?.id,
+      synagogue_name: data.settings.synagogue_name || data.synagogue?.name,
+      latitude: data.synagogue?.latitude,
+      longitude: data.synagogue?.longitude,
+      timezone: data.synagogue?.timezone || 'Asia/Jerusalem',
+    }] : [],
     PrayerTime: data.prayer_times || [], TorahLesson: data.lessons || [],
     Event: data.events || [], DisplayTheme: data.themes || [],
   })[name] || [];

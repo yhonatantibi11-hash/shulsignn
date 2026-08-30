@@ -12,14 +12,16 @@ export default function useClock() {
     hour: '2-digit',
     minute: '2-digit',
     second: '2-digit',
-    hour12: false
+    hour12: false,
+    timeZone: 'Asia/Jerusalem'
   });
 
   const dateFormatted = time.toLocaleDateString('he-IL', {
     weekday: 'long',
     year: 'numeric',
     month: 'long',
-    day: 'numeric'
+    day: 'numeric',
+    timeZone: 'Asia/Jerusalem'
   });
 
   return { time, formatted, dateFormatted };
