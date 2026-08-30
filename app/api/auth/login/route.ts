@@ -8,10 +8,13 @@ export async function POST(request: Request) {
     method: "POST", body: JSON.stringify({ email, password }),
   });
   if (!response.ok) return NextResponse.json({ error: "המייל או הסיסמה אינם נכונים" }, { status: 401 });
-  const session = await response.json() as { access_token: string; expires_in: number };
+  const session = await response.json() as { access_token: string; refresh_token: string; expires_in: number };
   const result = NextResponse.json({ ok: true });
   result.cookies.set("shulsign_access", session.access_token, {
     httpOnly: true, secure: true, sameSite: "lax", path: "/", maxAge: session.expires_in,
+  });
+  result.cookies.set("shulsign_refresh", session.refresh_token, {
+    httpOnly: true, secure: true, sameSite: "lax", path: "/", maxAge: 60 * 60 * 24 * 30,
   });
   return result;
 }
