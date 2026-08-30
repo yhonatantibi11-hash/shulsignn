@@ -70,7 +70,10 @@ export default function Display() {
   const [activePanel, setActivePanel] = useState(0);
 
   // Get synagogue ID from URL: /display?sid=xxx
-  const urlParams = new URLSearchParams(window.location.search);
+  const hashQuery = window.location.hash.includes('?')
+    ? window.location.hash.slice(window.location.hash.indexOf('?') + 1)
+    : window.location.search;
+  const urlParams = new URLSearchParams(hashQuery);
   const synagogueId = urlParams.get('sid');
 
   const loadData = useCallback(async () => {
