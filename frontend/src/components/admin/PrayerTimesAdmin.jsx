@@ -115,7 +115,7 @@ export default function PrayerTimesAdmin() {
     setEditingPrayer(prayer);
     setForm({
       name: prayer.name || '',
-      time: prayer.time || '',
+      time: prayer.time ? String(prayer.time).slice(0, 5) : '',
       notes: prayer.notes || '',
       days: prayer.days || (prayer.day_of_week ? [prayer.day_of_week] : ['everyday']),
       is_active: prayer.is_active !== false,
@@ -198,7 +198,7 @@ export default function PrayerTimesAdmin() {
                   disabled={updateMutation.isPending}
                 />
                 <span className="font-heebo font-bold text-primary tabular-nums w-14 text-center">
-                  {prayer.time}
+                  {String(prayer.time || '').slice(0, 5)}
                 </span>
                 <div className="flex-1 min-w-0 text-right">
                   <div className="flex items-center justify-end gap-2">
