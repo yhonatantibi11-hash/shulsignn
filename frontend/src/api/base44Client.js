@@ -8,6 +8,9 @@ let publicCache = null;
 
 async function jsonFetch(url, options) {
   const response = await fetch(url, { cache: 'no-store', ...options });
+  if (response.status === 401 && url.startsWith('/api/admin/')) {
+    window.location.assign('/admin');
+  }
   if (!response.ok) {
     let detail = '';
     try {
