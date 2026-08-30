@@ -38,6 +38,7 @@ export default function EventsAdmin() {
       closeDialog();
       toast.success('אירוע נוסף בהצלחה');
     },
+    onError: () => toast.error('האירוע לא נשמר. נסה שוב'),
   });
 
   const updateMutation = useMutation({
@@ -47,6 +48,7 @@ export default function EventsAdmin() {
       closeDialog();
       toast.success('אירוע עודכן');
     },
+    onError: () => toast.error('השינוי לא נשמר. נסה שוב'),
   });
 
   const deleteMutation = useMutation({
@@ -180,7 +182,9 @@ export default function EventsAdmin() {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={closeDialog} className="font-heebo">ביטול</Button>
-            <Button onClick={handleSave} className="font-heebo">{editing ? 'עדכן' : 'הוסף'}</Button>
+            <Button onClick={handleSave} disabled={createMutation.isPending || updateMutation.isPending} className="font-heebo">
+              {createMutation.isPending || updateMutation.isPending ? 'שומר...' : editing ? 'עדכן' : 'הוסף'}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
