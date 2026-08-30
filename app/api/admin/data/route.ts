@@ -37,7 +37,10 @@ export async function GET() {
       readTable("events", ctx.synagogue_id, ctx.token),
       readTable("display_themes", ctx.synagogue_id, ctx.token),
     ]);
-    return NextResponse.json({ synagogue: synagogue[0], settings: settings[0], prayers, lessons, events, themes, role: ctx.role, user_id: ctx.user_id });
+    return NextResponse.json(
+      { synagogue: synagogue[0], settings: settings[0], prayers, lessons, events, themes, role: ctx.role, user_id: ctx.user_id },
+      { headers: { "Cache-Control": "private, no-store, max-age=0" } },
+    );
   } catch {
     return NextResponse.json({ error: "load_failed" }, { status: 502 });
   }
@@ -77,5 +80,15 @@ export async function POST(request: Request) {
     headers: { Prefer: "return=representation" },
   });
   if (!response.ok) return NextResponse.json({ error: "save_failed", detail: await response.text() }, { status: response.status });
-  return NextResponse.json({ ok: true, rows: await response.json() });
+  const rows = await response.json() as Record<string, unknown>[];
+  if (!rows.length) {
+    return NextResponse.json(
+      { error: "no_rows_changed", detail: "No matching row was changed. Check the record id and database permissions." },
+      { status: 409 },
+    );
+  }
+  return NextResponse.json(
+    { ok: true, rows },
+    { headers: { "Cache-Control": "private, no-store, max-age=0" } },
+  );
 }
