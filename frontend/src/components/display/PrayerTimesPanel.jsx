@@ -88,7 +88,7 @@ export default function PrayerTimesPanel({ prayerTimes, hideTitle = false, manua
               }
               </div>
               <span className="text-3xl font-heebo font-black text-primary tabular-nums" dir="ltr">
-                {prayer.time}
+                {String(prayer.time || '').slice(0, 5)}
               </span>
             </div>
           )}
