@@ -77,11 +77,25 @@ export default function LessonsAdmin() {
   const createMutation = useMutation({
     mutationFn: (data) => base44.entities.TorahLesson.create(data),
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['lessons', synagogueId] }); closeDialog(); toast.success('שיעור נוסף בהצלחה'); },
+    onError: () => toast.error('השיעור לא נשמר. נסה שוב'),
   });
 
   const updateMutation = useMutation({
     mutationFn: ({ id, data }) => base44.entities.TorahLesson.update(id, data),
+    onMutate: async ({ id, data }) => {
+      const queryKey = ['lessons', synagogueId];
+      await queryClient.cancelQueries({ queryKey });
+      const previous = queryClient.getQueryData(queryKey);
+      queryClient.setQueryData(queryKey, (current = []) =>
+        current.map((lesson) => lesson.id === id ? { ...lesson, ...data } : lesson)
+      );
+      return { previous, queryKey };
+    },
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['lessons', synagogueId] }); closeDialog(); toast.success('שיעור עודכן'); },
+    onError: (_error, _variables, context) => {
+      if (context?.previous) queryClient.setQueryData(context.queryKey, context.previous);
+      toast.error('השינוי לא נשמר. נסה שוב');
+    },
   });
 
   const deleteMutation = useMutation({
@@ -169,6 +183,7 @@ export default function LessonsAdmin() {
                 <Switch
                   checked={lesson.is_active !== false}
                   onCheckedChange={() => updateMutation.mutate({ id: lesson.id, data: { is_active: !(lesson.is_active !== false) } })}
+                  disabled={updateMutation.isPending}
                 />
                 <span className="font-heebo font-bold text-primary tabular-nums w-14 text-center">{lesson.time}</span>
                 <div className="flex-1 min-w-0 text-right">
@@ -286,7 +301,9 @@ export default function LessonsAdmin() {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={closeDialog} className="font-heebo">ביטול</Button>
-            <Button onClick={handleSave} className="font-heebo">{editing ? 'עדכן' : 'הוסף'}</Button>
+            <Button onClick={handleSave} disabled={createMutation.isPending || updateMutation.isPending} className="font-heebo">
+              {createMutation.isPending || updateMutation.isPending ? 'שומר...' : editing ? 'עדכן' : 'הוסף'}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
